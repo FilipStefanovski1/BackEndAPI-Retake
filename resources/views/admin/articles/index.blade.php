@@ -3,6 +3,14 @@
 @section('content')
 <div class="container py-4">
     <h2>All Articles</h2>
+
+    {{-- ✅ Show success message --}}
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <a href="{{ route('admin.articles.create') }}" class="btn btn-success mb-3">+ New Article</a>
 
     @foreach ($articles as $article)

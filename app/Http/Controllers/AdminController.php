@@ -6,21 +6,27 @@ use Illuminate\Http\Request;
 use App\Models\Article;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Http\Middleware\IsAdmin;
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', IsAdmin::class]);
+    }
+
     // Dashboard homepage
     public function dashboard()
     {
         $articleCount = Article::count();
         $userCount = User::where('role', 'user')->count();
         $adminCount = User::where('role', 'admin')->count();
+        $articles = Article::latest()->get();
 
-        return view('admin.dashboard', compact('articleCount', 'userCount', 'adminCount'));
+        return view('admin.dashboard', compact('articleCount', 'userCount', 'adminCount', 'articles'));
     }
 
-    // List all articles
+    // Show all articles (paginated)
     public function articles()
     {
         $articles = Article::latest()->paginate(10);
@@ -33,7 +39,7 @@ class AdminController extends Controller
         return view('admin.articles.create');
     }
 
-    // Store a new article
+    // Store new article
     public function storeArticle(Request $request)
     {
         $request->validate([
@@ -77,6 +83,7 @@ class AdminController extends Controller
             'published' => 'nullable|boolean'
         ]);
 
+        // Handle optional image replacement
         if ($request->hasFile('image')) {
             if ($article->image) {
                 Storage::disk('public')->delete($article->image);
@@ -84,11 +91,12 @@ class AdminController extends Controller
             $article->image = $request->file('image')->store('articles', 'public');
         }
 
-        $article->update([
-            'title' => $request->title,
-            'content' => $request->content,
-            'published' => $request->has('published'),
-        ]);
+        // Update remaining fields
+        $article->title = $request->title;
+        $article->content = $request->content;
+        $article->published = $request->has('published');
+
+        $article->save(); // ✅ Important to actually save the model
 
         return redirect()->route('admin.articles')->with('success', 'Article updated.');
     }
@@ -114,7 +122,7 @@ class AdminController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    // Delete a user
+    // Delete user
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);

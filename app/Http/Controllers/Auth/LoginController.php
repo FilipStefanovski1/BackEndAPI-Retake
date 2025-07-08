@@ -9,14 +9,6 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/profile';
-
-
-    /**
      * Create a new controller instance.
      */
     public function __construct()
@@ -26,7 +18,7 @@ class LoginController extends Controller
     }
 
     /**
-     * Show login form
+     * Show the login form.
      */
     public function showLoginForm()
     {
@@ -34,7 +26,7 @@ class LoginController extends Controller
     }
 
     /**
-     * Handle login attempt
+     * Handle login request.
      */
     public function login(Request $request)
     {
@@ -42,7 +34,13 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended($this->redirectTo);
+
+            $user = Auth::user();
+            if ($user->role === 'admin') {
+                return redirect('/admin/dashboard');
+            }
+
+            return redirect('/profile');
         }
 
         return back()->withErrors([
@@ -51,7 +49,7 @@ class LoginController extends Controller
     }
 
     /**
-     * Handle logout
+     * Handle logout.
      */
     public function logout(Request $request)
     {

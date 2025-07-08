@@ -1,18 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="mb-4">Admin Dashboard</h1>
-    <div class="row">
-        <div class="col-md-4">
-            <a href="{{ route('admin.articles') }}" class="btn btn-primary w-100 mb-3">Manage Articles</a>
-        </div>
-        <div class="col-md-4">
-            <a href="{{ route('admin.users') }}" class="btn btn-secondary w-100 mb-3">Manage Users</a>
-        </div>
-        <div class="col-md-4">
-            <a href="{{ route('admin.admins') }}" class="btn btn-dark w-100 mb-3">View Admins</a>
-        </div>
+<div class="container">
+    <h2 class="mb-4">Admin Dashboard – Articles Overview</h2>
+
+    <div class="mb-4">
+        <strong>Total Articles:</strong> {{ $articleCount }}<br>
+        <strong>Total Users:</strong> {{ $userCount }}<br>
+        <strong>Total Admins:</strong> {{ $adminCount }}
     </div>
+
+    <a href="{{ route('admin.articles.create') }}" class="btn btn-success mb-3">Create New Article</a>
+
+    @if($articles->isEmpty())
+        <div class="alert alert-info">No articles found.</div>
+    @else
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Published</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($articles as $article)
+                    <tr>
+                        <td>{{ $article->title }}</td>
+                        <td>
+                            @if($article->published)
+                                <span class="badge bg-success">Yes</span>
+                            @else
+                                <span class="badge bg-secondary">No</span>
+                            @endif
+                        </td>
+                        <td>{{ $article->created_at->format('d M Y') }}</td>
+                        <td>
+                            <a href="{{ route('admin.articles.edit', $article->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                            <form action="{{ route('admin.articles.delete', $article->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this article?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 </div>
 @endsection

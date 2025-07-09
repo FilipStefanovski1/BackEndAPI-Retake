@@ -18,6 +18,13 @@ Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles
 
 /*
 |--------------------------------------------------------------------------
+| Live Search Endpoint (AJAX)
+|--------------------------------------------------------------------------
+*/
+Route::get('/search-suggestions', [ArticleController::class, 'searchSuggestions']);
+
+/*
+|--------------------------------------------------------------------------
 | Auth Routes
 |--------------------------------------------------------------------------
 */
@@ -30,7 +37,7 @@ Route::post('/register', [RegisterController::class, 'register']);
 
 /*
 |--------------------------------------------------------------------------
-| Profile Route
+| Profile Route (User Dashboard)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
@@ -39,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes (Using full middleware class reference)
+| Admin Routes (Hidden Admin Panel)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () {

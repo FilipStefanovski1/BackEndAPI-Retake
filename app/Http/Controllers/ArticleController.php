@@ -13,8 +13,10 @@ class ArticleController extends Controller
 
         $articles = Article::where('published', true)
             ->when($search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
                       ->orWhere('content', 'like', "%{$search}%");
+                });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(5);
@@ -24,7 +26,7 @@ class ArticleController extends Controller
             ->take(5)
             ->get();
 
-        return view('articles.index', compact('articles', 'latestArticles', 'search'));
+        return view('articles.index', compact('articles', 'search', 'latestArticles'));
     }
 
     public function show($id)

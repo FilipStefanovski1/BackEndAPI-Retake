@@ -15,7 +15,7 @@ class AdminController extends Controller
         $this->middleware(['auth', IsAdmin::class]);
     }
 
-    // Dashboard homepage
+    // Admin Dashboard
     public function dashboard()
     {
         $articleCount = Article::count();
@@ -26,20 +26,25 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('articleCount', 'userCount', 'adminCount', 'articles'));
     }
 
-    // Show all articles (paginated)
+    // Admin: Article list
     public function articles()
     {
         $articles = Article::latest()->paginate(10);
-        return view('admin.articles.index', compact('articles'));
+        $latestArticles = Article::where('published', true)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('admin.articles.index', compact('articles', 'latestArticles'));
     }
 
-    // Show create article form
+    // Admin: Show create article form
     public function createArticle()
     {
         return view('admin.articles.create');
     }
 
-    // Store new article
+    // Admin: Store article
     public function storeArticle(Request $request)
     {
         $request->validate([
@@ -64,14 +69,14 @@ class AdminController extends Controller
         return redirect()->route('admin.articles')->with('success', 'Article created.');
     }
 
-    // Show edit form
+    // Admin: Edit form
     public function editArticle($id)
     {
         $article = Article::findOrFail($id);
         return view('admin.articles.edit', compact('article'));
     }
 
-    // Update article
+    // Admin: Update article
     public function updateArticle(Request $request, $id)
     {
         $article = Article::findOrFail($id);
@@ -83,25 +88,26 @@ class AdminController extends Controller
             'published' => 'nullable|boolean'
         ]);
 
-        // Handle optional image replacement
         if ($request->hasFile('image')) {
+            logger('Uploading new image: ' . $request->file('image')->getClientOriginalName());
+
             if ($article->image) {
                 Storage::disk('public')->delete($article->image);
             }
+
             $article->image = $request->file('image')->store('articles', 'public');
         }
 
-        // Update remaining fields
         $article->title = $request->title;
         $article->content = $request->content;
         $article->published = $request->has('published');
 
-        $article->save(); // ✅ Important to actually save the model
+        $article->save();
 
         return redirect()->route('admin.articles')->with('success', 'Article updated.');
     }
 
-    // Delete article
+    // Admin: Delete article
     public function deleteArticle($id)
     {
         $article = Article::findOrFail($id);
@@ -115,14 +121,14 @@ class AdminController extends Controller
         return redirect()->route('admin.articles')->with('success', 'Article deleted.');
     }
 
-    // List all regular users
+    // Admin: List users
     public function users()
     {
         $users = User::where('role', 'user')->paginate(10);
         return view('admin.users.index', compact('users'));
     }
 
-    // Delete user
+    // Admin: Delete user
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);
@@ -136,7 +142,7 @@ class AdminController extends Controller
         return redirect()->route('admin.users')->with('success', 'User deleted.');
     }
 
-    // List all admins
+    // Admin: List admins
     public function admins()
     {
         $admins = User::where('role', 'admin')->paginate(10);

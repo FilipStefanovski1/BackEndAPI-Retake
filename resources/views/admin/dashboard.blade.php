@@ -4,14 +4,21 @@
 <div class="container">
     <h2 class="mb-4">Admin Dashboard – Articles Overview</h2>
 
+    <!-- Stats -->
     <div class="mb-4">
         <strong>Total Articles:</strong> {{ $articleCount }}<br>
         <strong>Total Users:</strong> {{ $userCount }}<br>
         <strong>Total Admins:</strong> {{ $adminCount }}
     </div>
 
-    <a href="{{ route('admin.articles.create') }}" class="btn btn-success mb-3">Create New Article</a>
+    <!-- Management Links -->
+    <div class="mb-4 d-flex gap-2 flex-wrap">
+        <a href="{{ route('admin.users') }}" class="btn btn-outline-primary">View All Users</a>
+        <a href="{{ route('admin.admins') }}" class="btn btn-outline-secondary">View All Admins</a>
+        <a href="{{ route('admin.articles.create') }}" class="btn btn-success">Create New Article</a>
+    </div>
 
+    <!-- Article Table -->
     @if($articles->isEmpty())
         <div class="alert alert-info">No articles found.</div>
     @else

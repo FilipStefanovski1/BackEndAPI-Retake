@@ -80,6 +80,15 @@
                             </div>
                         </div>
                     </form>
+
+                    <!-- Register Link -->
+                    <div class="text-center mt-4">
+                        <p class="mb-0">
+                            Don't have an account?
+                            <a href="{{ route('register') }}">Register now</a>.
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </div>

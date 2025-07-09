@@ -21,6 +21,15 @@
     <div class="row">
         <!-- Main Column -->
         <div class="col-md-8">
+
+            <!-- Search Bar -->
+            <form action="{{ route('home') }}" method="GET" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search articles...">
+                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                </div>
+            </form>
+
             @if($articles->count())
                 <!-- Featured Article -->
                 @php $featured = $articles->first(); @endphp
@@ -60,8 +69,9 @@
                 <p>No articles found.</p>
             @endif
 
-            <div class="mt-4">
-                {{ $articles->links() }}
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-4">
+                {{ $articles->links('pagination::bootstrap-5') }}
             </div>
         </div>
 

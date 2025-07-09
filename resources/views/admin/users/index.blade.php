@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container py-4">
+    <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary mb-3">← Back to Dashboard</a>
     <h2>Users</h2>
 
     @foreach ($users as $user)

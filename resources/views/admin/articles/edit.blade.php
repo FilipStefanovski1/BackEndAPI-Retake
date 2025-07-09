@@ -4,18 +4,29 @@
 <div class="container py-4">
     <h2>Edit Article</h2>
 
+    {{-- Show validation errors --}}
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('admin.articles.update', $article->id) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
             <label>Title</label>
-            <input type="text" name="title" value="{{ $article->title }}" class="form-control" required>
+            <input type="text" name="title" value="{{ old('title', $article->title) }}" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label>Content</label>
-            <textarea name="content" rows="6" class="form-control" required>{{ $article->content }}</textarea>
+            <textarea name="content" rows="6" class="form-control" required>{{ old('content', $article->content) }}</textarea>
         </div>
 
         <div class="mb-3">

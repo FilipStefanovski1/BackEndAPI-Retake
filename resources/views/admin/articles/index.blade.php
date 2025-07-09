@@ -1,34 +1,96 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .card:hover {
+        box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
+    .featured-img {
+        object-fit: cover;
+        height: 250px;
+        width: 100%;
+    }
+    .object-fit-cover {
+        object-fit: cover;
+    }
+</style>
+
 <div class="container py-4">
-    <h2>All Articles</h2>
+    <div class="row">
+        <!-- Main Column -->
+        <div class="col-md-8">
 
-    {{-- ✅ Show success message --}}
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+            <h4 class="mb-4">All Articles</h4>
 
-    <a href="{{ route('admin.articles.create') }}" class="btn btn-success mb-3">+ New Article</a>
-
-    @foreach ($articles as $article)
-        <div class="border p-3 mb-3 rounded">
-            <h4>{{ $article->title }}</h4>
-            <p><small>{{ $article->created_at->format('F j, Y') }}</small></p>
-            <p>Status: <strong>{{ $article->published ? 'Published' : 'Draft' }}</strong></p>
-
-            <a href="{{ route('admin.articles.edit', $article->id) }}" class="btn btn-sm btn-warning">Edit</a>
-
-            <form action="{{ route('admin.articles.delete', $article->id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Delete this article?');">
-                @csrf
-                @method('DELETE')
-                <button class="btn btn-sm btn-danger">Delete</button>
+            <!-- Search Bar -->
+            <form action="{{ route('home') }}" method="GET" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search articles...">
+                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                </div>
             </form>
-        </div>
-    @endforeach
 
-    {{ $articles->links() }}
+            @if($articles->count())
+                <!-- Featured Article (first one only) -->
+                @php $featured = $articles->first(); @endphp
+                <div class="card mb-5 shadow-sm">
+                    <img src="{{ $featured->image ? asset('storage/' . $featured->image) : 'https://via.placeholder.com/1000x400?text=No+Image' }}" class="featured-img rounded-top" alt="{{ $featured->title }}">
+                    <div class="card-body">
+                        <span class="badge bg-danger mb-2">Featured</span>
+                        <h2 class="card-title">{{ $featured->title }}</h2>
+                        <p class="text-muted small">{{ $featured->created_at->format('F j, Y') }}</p>
+                        <p class="card-text">{{ \Illuminate\Support\Str::limit(strip_tags($featured->content), 150) }}</p>
+                        <a href="{{ route('articles.show', $featured->id) }}" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+
+                <!-- Remaining Articles (grid) -->
+                <div class="row">
+                    @foreach($articles->skip(1) as $article)
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                @if($article->image)
+                                    <img src="{{ asset('storage/' . $article->image) }}" class="card-img-top object-fit-cover" style="height: 180px;" alt="{{ $article->title }}">
+                                @endif
+                                <div class="card-body">
+                                    <span class="badge bg-secondary mb-2">News</span>
+                                    <h5 class="card-title">{{ $article->title }}</h5>
+                                    <p class="text-muted small">{{ $article->created_at->format('F j, Y') }}</p>
+                                    <p class="card-text">{{ \Illuminate\Support\Str::limit(strip_tags($article->content), 100) }}</p>
+                                    <a href="{{ route('articles.show', $article->id) }}" class="btn btn-sm btn-outline-primary">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p>No articles found.</p>
+            @endif
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-4">
+                {{ $articles->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+
+        <!-- Sidebar: Latest Articles -->
+        <div class="col-md-4">
+            <div class="position-sticky" style="top: 90px;">
+                <h5 class="mb-4">Latest Articles</h5>
+                <ul class="list-unstyled">
+                    @foreach($latestArticles as $latest)
+                        <li class="mb-3 border-bottom pb-2">
+                            <a href="{{ route('articles.show', $latest->id) }}" class="fw-semibold text-dark text-decoration-none d-block">
+                                {{ $latest->title }}
+                            </a>
+                            <small class="text-muted">{{ $latest->created_at->format('M d, Y') }}</small>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

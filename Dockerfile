@@ -15,16 +15,18 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy Laravel app files
+# Copy Laravel files
 COPY . /var/www/html
 
-# Install Composer
+# Change the web root to the Laravel public directory
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
+
+# Copy Composer and install dependencies
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expose port and run Apache
 EXPOSE 80
 CMD ["apache2-foreground"]

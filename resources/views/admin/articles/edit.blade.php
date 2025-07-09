@@ -4,7 +4,6 @@
 <div class="container py-4">
     <h2>Edit Article</h2>
 
-    {{-- Show validation errors --}}
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -16,8 +15,8 @@
     @endif
 
     <form method="POST" action="{{ route('admin.articles.update', $article->id) }}" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_method" value="PUT">
 
         <div class="mb-3">
             <label>Title</label>

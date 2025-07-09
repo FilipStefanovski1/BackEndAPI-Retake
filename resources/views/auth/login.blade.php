@@ -11,9 +11,8 @@
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
-                        @csrf
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-                        <!-- Email Address -->
                         <div class="mb-3 row">
                             <label for="email" class="col-md-4 col-form-label text-md-end">
                                 {{ __('Email Address') }}
@@ -32,7 +31,6 @@
                             </div>
                         </div>
 
-                        <!-- Password -->
                         <div class="mb-3 row">
                             <label for="password" class="col-md-4 col-form-label text-md-end">
                                 {{ __('Password') }}
@@ -51,7 +49,6 @@
                             </div>
                         </div>
 
-                        <!-- Remember Me -->
                         <div class="mb-3 row">
                             <div class="col-md-6 offset-md-4">
                                 <div class="form-check">
@@ -65,7 +62,6 @@
                             </div>
                         </div>
 
-                        <!-- Submit -->
                         <div class="mb-0 row">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary px-4">
@@ -81,7 +77,6 @@
                         </div>
                     </form>
 
-                    <!-- Register Link -->
                     <div class="text-center mt-4">
                         <p class="mb-0">
                             Don't have an account?

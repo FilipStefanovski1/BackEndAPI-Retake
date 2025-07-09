@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('content')
+@push('styles')
 <style>
     .card:hover {
         box-shadow: 0 8px 18px rgba(0,0,0,0.1);
@@ -16,13 +16,12 @@
         object-fit: cover;
     }
 </style>
+@endpush
 
+@section('content')
 <div class="container py-4">
     <div class="row">
-        <!-- Main Column -->
         <div class="col-md-8">
-
-            <!-- Search Bar -->
             <form action="{{ route('home') }}" method="GET" class="mb-4">
                 <div class="input-group">
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search articles...">
@@ -31,22 +30,18 @@
             </form>
 
             @if($articles->count())
-                <!-- Featured Article -->
                 @php $featured = $articles->first(); @endphp
                 <div class="card mb-5 shadow-sm">
                     <img src="{{ $featured->image ? asset('storage/' . $featured->image) : 'https://via.placeholder.com/1000x400?text=No+Image' }}" class="featured-img rounded-top" alt="{{ $featured->title }}">
                     <div class="card-body">
                         <span class="badge bg-danger mb-2">Featured</span>
                         <h2 class="card-title">{{ $featured->title }}</h2>
-                        <p class="text-muted small">
-                            {{ $featured->created_at->format('F j, Y') }} • {{ ceil(str_word_count($featured->content) / 200) }} min read
-                        </p>
+                        <p class="text-muted small">{{ $featured->created_at->format('F j, Y') }} • {{ ceil(str_word_count($featured->content) / 200) }} min read</p>
                         <p class="card-text">{{ \Illuminate\Support\Str::limit(strip_tags($featured->content), 150) }}</p>
                         <a href="{{ route('articles.show', $featured->id) }}" class="btn btn-primary">Read More</a>
                     </div>
                 </div>
 
-                <!-- Grid of Remaining Articles -->
                 <div class="row">
                     @foreach($articles->skip(1) as $article)
                         <div class="col-md-6 mb-4">
@@ -55,9 +50,7 @@
                                 <div class="card-body">
                                     <span class="badge bg-secondary mb-2">News</span>
                                     <h5 class="card-title">{{ $article->title }}</h5>
-                                    <p class="text-muted small">
-                                        {{ $article->created_at->format('F j, Y') }} • {{ ceil(str_word_count($article->content) / 200) }} min read
-                                    </p>
+                                    <p class="text-muted small">{{ $article->created_at->format('F j, Y') }} • {{ ceil(str_word_count($article->content) / 200) }} min read</p>
                                     <p class="card-text">{{ \Illuminate\Support\Str::limit(strip_tags($article->content), 100) }}</p>
                                     <a href="{{ route('articles.show', $article->id) }}" class="btn btn-sm btn-outline-primary">Read More</a>
                                 </div>
@@ -69,13 +62,11 @@
                 <p>No articles found.</p>
             @endif
 
-            <!-- Pagination -->
             <div class="d-flex justify-content-center mt-4">
                 {{ $articles->links('pagination::bootstrap-5') }}
             </div>
         </div>
 
-        <!-- Sidebar Column -->
         <div class="col-md-4">
             <div class="position-sticky" style="top: 90px;">
                 <h5 class="mb-4">Latest Articles</h5>

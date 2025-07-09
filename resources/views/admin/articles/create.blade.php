@@ -5,7 +5,7 @@
     <h2>Create New Article</h2>
 
     <form method="POST" action="{{ route('admin.articles.store') }}" enctype="multipart/form-data">
-        @csrf
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
         <div class="mb-3">
             <label>Title</label>

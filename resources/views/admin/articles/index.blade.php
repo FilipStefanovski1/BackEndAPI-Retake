@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('content')
+@push('styles')
 <style>
     .card:hover {
         box-shadow: 0 8px 18px rgba(0,0,0,0.1);
@@ -16,15 +16,14 @@
         object-fit: cover;
     }
 </style>
+@endpush
 
+@section('content')
 <div class="container py-4">
     <div class="row">
-        <!-- Main Column -->
         <div class="col-md-8">
-
             <h4 class="mb-4">All Articles</h4>
 
-            <!-- Search Bar -->
             <form action="{{ route('home') }}" method="GET" class="mb-4">
                 <div class="input-group">
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search articles...">
@@ -33,7 +32,6 @@
             </form>
 
             @if($articles->count())
-                <!-- Featured Article (first one only) -->
                 @php $featured = $articles->first(); @endphp
                 <div class="card mb-5 shadow-sm">
                     <img src="{{ $featured->image ? asset('storage/' . $featured->image) : 'https://via.placeholder.com/1000x400?text=No+Image' }}" class="featured-img rounded-top" alt="{{ $featured->title }}">
@@ -46,7 +44,6 @@
                     </div>
                 </div>
 
-                <!-- Remaining Articles (grid) -->
                 <div class="row">
                     @foreach($articles->skip(1) as $article)
                         <div class="col-md-6 mb-4">
@@ -69,13 +66,11 @@
                 <p>No articles found.</p>
             @endif
 
-            <!-- Pagination -->
             <div class="d-flex justify-content-center mt-4">
                 {{ $articles->links('pagination::bootstrap-5') }}
             </div>
         </div>
 
-        <!-- Sidebar: Latest Articles -->
         <div class="col-md-4">
             <div class="position-sticky" style="top: 90px;">
                 <h5 class="mb-4">Latest Articles</h5>

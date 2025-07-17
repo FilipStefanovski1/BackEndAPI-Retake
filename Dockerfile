@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     sqlite3 \
     libsqlite3-dev \
-    && docker-php-ext-install pdo pdo_sqlite zip
+    libpq-dev \
+    && docker-php-ext-install pdo pdo_sqlite pdo_pgsql zip
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite

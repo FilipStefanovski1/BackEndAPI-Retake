@@ -15,8 +15,8 @@
     @endif
 
     <form method="POST" action="{{ route('admin.articles.update', $article->id) }}" enctype="multipart/form-data">
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="_method" value="PUT">
+        @csrf
+        @method('PUT')
 
         <div class="mb-3">
             <label>Title</label>
@@ -31,9 +31,9 @@
         <div class="mb-3">
             <label>Image (optional)</label>
             <input type="file" name="image" class="form-control">
-            @if ($article->image)
-                <img src="{{ asset('storage/' . $article->image) }}" class="img-fluid mt-2" width="200">
-            @endif
+            <div class="mt-2">
+                <img src="{{ $article->image_url }}" class="img-fluid rounded" width="200" alt="Current Article Image">
+            </div>
         </div>
 
         <div class="form-check mb-3">

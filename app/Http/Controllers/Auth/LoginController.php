@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -32,8 +35,24 @@ class LoginController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
+        // Debug logging
+        $user = User::where('email', $request->email)->first();
+
+        Log::info('Login attempt', [
+            'email' => $request->email,
+            'user_found' => $user ? true : false,
+            'stored_hash' => $user?->password,
+            'password_match' => $user ? Hash::check($request->password, $user->password) : null,
+            'user_role' => $user?->role,
+        ]);
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            Log::info('Login successful', [
+                'email' => $request->email,
+                'role' => Auth::user()->role,
+            ]);
 
             $user = Auth::user();
             if ($user->role === 'admin') {
@@ -42,6 +61,10 @@ class LoginController extends Controller
 
             return redirect('/profile');
         }
+
+        Log::warning('Login failed: credentials did not match', [
+            'email' => $request->email
+        ]);
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',

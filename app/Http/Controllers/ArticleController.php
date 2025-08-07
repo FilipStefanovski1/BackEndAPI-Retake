@@ -51,15 +51,16 @@ class ArticleController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'published' => 'nullable|boolean',
         ]);
 
-        $article = new Article($request->only(['title', 'content', 'published']));
+        $article = new Article();
+        $article->title = $request->title;
+        $article->content = $request->content;
+        $article->published = $request->has('published');
 
         if ($request->hasFile('image')) {
-            $filename = time() . '.' . $request->file('image')->getClientOriginalExtension();
-            $request->file('image')->storeAs('articles', $filename, 'public');
-            $article->image = 'articles/' . $filename;
+            $path = $request->file('image')->store('articles', 'public');
+            $article->image = $path;
         }
 
         $article->save();
@@ -78,20 +79,20 @@ class ArticleController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'published' => 'nullable|boolean',
         ]);
 
-        $article->fill($request->only(['title', 'content', 'published']));
+        $article->title = $request->title;
+        $article->content = $request->content;
+        $article->published = $request->has('published');
 
         if ($request->hasFile('image')) {
-            // Delete old image
+            // Delete old image if exists
             if ($article->image && Storage::disk('public')->exists($article->image)) {
                 Storage::disk('public')->delete($article->image);
             }
 
-            $filename = time() . '.' . $request->file('image')->getClientOriginalExtension();
-            $request->file('image')->storeAs('articles', $filename, 'public');
-            $article->image = 'articles/' . $filename;
+            $path = $request->file('image')->store('articles', 'public');
+            $article->image = $path;
         }
 
         $article->save();
